@@ -3,6 +3,9 @@ package com.example.weatherdiary.service;
 import com.example.weatherdiary.domain.repository.DiaryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +15,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,12 +32,15 @@ public class DiaryService {
     private String city;
 
     public String createDiary(LocalDate date, String text) throws IOException {
-        System.out.println(getWeatherString());
 
-        return  "";
+        String weatherData = getWeatherString();
+        Map<String, Object> parseWeather = parseWeather(weatherData);
+
+        return "";
     }
 
-    private String getWeatherString() throws IOException {
+
+    private String getWeatherString() throws IOException { // openweathermap api 호출 데이터 가져오기
 
         String apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey;
         try {
@@ -60,5 +68,28 @@ public class DiaryService {
 
             return "Failed";
         }
+    }
+
+    private Map<String, Object> parseWeather(String jsonString) { // openweathermap 데이터 파싱
+
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject;
+
+
+        try {
+            jsonObject = (JSONObject) jsonParser.parse(jsonString);
+
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
+        Map<String,Object> resultMap = new HashMap<>();
+
+        JSONObject mainData = (JSONObject) jsonObject.get("main");
+        resultMap.put("temp",mainData.get("temp"));
+        JSONObject weatherData = (JSONObject) jsonObject.get("weather");
+        resultMap.put("main",weatherData.get("main"));
+        resultMap.put("icon",weatherData.get("icon"));
+        return resultMap;
     }
 }
