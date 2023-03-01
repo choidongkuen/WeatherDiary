@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDate;
 
@@ -16,6 +18,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table
+@Where(clause = "DELETED_AT is null")
+@SQLDelete(sql = "UPDATE diary SET diary.DELETED_AT = CURRENT_TIMESTAMP WHERE diary.id = ?")
 @Entity
 public class Diary extends BaseEntity {
     @Id
