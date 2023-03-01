@@ -1,5 +1,6 @@
 package com.example.weatherdiary.domain.entity;
 
+import com.example.weatherdiary.dto.ModifyDiaryRequestDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,10 +32,17 @@ public class Diary extends BaseEntity {
     @Column(name = "temperature")
     private Double temperature;
 
+    @Column(name = "title")
+    private String title;
+
     @Column(name = "text")
     private String text;
 
     @Column(name = "date")
     private LocalDate date;
 
+    public void update(ModifyDiaryRequestDto request) {
+        this.title = request.getTitle();
+        this.text = request.getText();
+    }
 }
