@@ -147,4 +147,13 @@ public class DiaryService {
 
         diary.update(request);
     }
+
+    @Transactional
+    public void deleteDiary(Long id) {
+
+        Diary diary = diaryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundDiaryException("일치하는 일기 데이터가 존재하지 않습니다."));
+
+        diaryRepository.delete(diary);
+    }
 }
