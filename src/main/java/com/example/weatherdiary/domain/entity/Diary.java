@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Slf4j
 @Getter
@@ -17,7 +16,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Table
 @Entity
-public class Diary {
+public class Diary extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

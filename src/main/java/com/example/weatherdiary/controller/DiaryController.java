@@ -22,7 +22,7 @@ public class DiaryController {
     @PostMapping()
     public ResponseEntity createDiary(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestBody Map<String, String> text
+            @RequestBody Map<String, String> text // JSON 형식 그대로 들어오기 때문에 MAP 으로 받기
     ) throws IOException {
         diaryService.createDiary(date,text.get("text"));
         return ResponseEntity.ok().build();
