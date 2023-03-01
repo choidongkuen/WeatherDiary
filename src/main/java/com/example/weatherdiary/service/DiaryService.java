@@ -2,6 +2,7 @@ package com.example.weatherdiary.service;
 
 import com.example.weatherdiary.domain.entity.Diary;
 import com.example.weatherdiary.domain.repository.DiaryRepository;
+import com.example.weatherdiary.dto.DateInfo;
 import com.example.weatherdiary.exception.NotFoundDiaryException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,8 +11,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.beans.Transient;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -36,6 +40,7 @@ public class DiaryService {
     @Value("${openweathermap.city}")
     private String city;
 
+    @Transactional
     public void createDiary(LocalDate date, String text) throws IOException {
 
         String weatherData = getWeatherString();
@@ -107,13 +112,29 @@ public class DiaryService {
         return resultMap;
     }
 
+    @Transactional(readOnly = true)
     public List<Diary> readDiary(LocalDate date) {
 
-        Optional<List<Diary>> diaryList = diaryRepository.findAllByDate(date);
-        if(0 == diaryList.get().size()) {
+        List<Diary> diaryList = diaryRepository.findAllByDate(date);
+        checkException(diaryList);
+
+        return diaryList;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Diary> readDiaries(DateInfo request) {
+
+        List<Diary> diaryList
+                = diaryRepository.findAllByDateBetween(request.getStartDate(),request.getEndDate());
+
+        checkException(diaryList);
+
+        return diaryList;
+    }
+
+    private static void checkException(List<Diary> diaryList) {
+        if(0 == diaryList.size()) {
             throw new NotFoundDiaryException("일치하는 일기 데이터가 존재하지 않습니다.");
         }
-
-        return diaryList.get();
     }
 }

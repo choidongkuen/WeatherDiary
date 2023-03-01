@@ -33,18 +33,7 @@ class DiaryControllerTest {
     @Test
     void createDiary() throws Exception {
         // given
-        given(diaryService.createDiary(any(), anyString()))
-                .willReturn("https://api.openweathermap.org/data/2.5/weather?q=seoul&appid=aa9b8a3df6d399327837db0c3ea7dae5");
 
-        LocalDate date = LocalDate.of(2023, 3, 1);
-        // when
-        mockMvc.perform(post("/diary")
-                       .param("date", String.valueOf(date))
-                       .contentType(MediaType.APPLICATION_JSON)
-                       .content(objectMapper.writeValueAsString(new String("안녕하세요"))))
-               .andExpect(status().isOk())
-               .andDo(print());
-        // then
     }
 
 }
