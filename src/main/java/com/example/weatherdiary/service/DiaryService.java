@@ -2,6 +2,7 @@ package com.example.weatherdiary.service;
 
 import com.example.weatherdiary.domain.entity.Diary;
 import com.example.weatherdiary.domain.repository.DiaryRepository;
+import com.example.weatherdiary.exception.NotFoundDiaryException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
@@ -18,7 +19,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -102,5 +105,15 @@ public class DiaryService {
         resultMap.put("main",weatherDataObj.get("main"));
         resultMap.put("icon",weatherDataObj.get("icon"));
         return resultMap;
+    }
+
+    public List<Diary> readDiary(LocalDate date) {
+
+        Optional<List<Diary>> diaryList = diaryRepository.findAllByDate(date);
+        if(0 == diaryList.get().size()) {
+            throw new NotFoundDiaryException("일치하는 일기 데이터가 존재하지 않습니다.");
+        }
+
+        return diaryList.get();
     }
 }
