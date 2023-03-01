@@ -1,6 +1,7 @@
 package com.example.weatherdiary.controller;
 
 import com.example.weatherdiary.domain.entity.Diary;
+import com.example.weatherdiary.dto.DateInfo;
 import com.example.weatherdiary.service.DiaryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,12 +33,20 @@ public class DiaryController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Diary>> getDiary(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    public ResponseEntity<List<Diary>> readDiary(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date
     ){
         return new ResponseEntity<>(
                 diaryService.readDiary(date), HttpStatus.OK);
 
     }
 
+    @GetMapping("/between")
+    public ResponseEntity<List<Diary>> readDiaries(
+            @ModelAttribute DateInfo request
+    ) {
+        return new ResponseEntity<>(
+                diaryService.readDiaries(request), HttpStatus.OK
+        );
+    }
 }
