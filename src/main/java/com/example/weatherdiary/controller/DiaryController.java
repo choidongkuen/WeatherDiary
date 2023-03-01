@@ -5,7 +5,6 @@ import com.example.weatherdiary.dto.CreateDiaryRequestDto;
 import com.example.weatherdiary.dto.DateInfo;
 import com.example.weatherdiary.dto.ModifyDiaryRequestDto;
 import com.example.weatherdiary.service.DiaryService;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -58,6 +57,14 @@ public class DiaryController {
             @PathVariable("diaryId") Long id
     ) {
         diaryService.modifyDiary(request, id);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("{diaryId}")
+    public ResponseEntity deleteDiary(
+            @PathVariable("diaryId") Long id
+    ) {
+        diaryService.deleteDiary(id);
         return ResponseEntity.ok().build();
     }
 }
