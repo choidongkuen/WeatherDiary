@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Slf4j
@@ -35,6 +36,6 @@ public class Diary {
     private String text;
 
     @Column(name = "date")
-    private Date date;
+    private LocalDate date;
 
 }
