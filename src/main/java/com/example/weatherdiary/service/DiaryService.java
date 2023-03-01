@@ -2,7 +2,9 @@ package com.example.weatherdiary.service;
 
 import com.example.weatherdiary.domain.entity.Diary;
 import com.example.weatherdiary.domain.repository.DiaryRepository;
+import com.example.weatherdiary.dto.CreateDiaryRequestDto;
 import com.example.weatherdiary.dto.DateInfo;
+import com.example.weatherdiary.dto.ModifyDiaryRequestDto;
 import com.example.weatherdiary.exception.NotFoundDiaryException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,11 +13,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.beans.Transient;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -25,7 +25,6 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -41,18 +40,19 @@ public class DiaryService {
     private String city;
 
     @Transactional
-    public void createDiary(LocalDate date, String text) throws IOException {
+    public void createDiary(LocalDate date, CreateDiaryRequestDto request) throws IOException {
 
         String weatherData = getWeatherString();
         Map<String, Object> parseWeather = parseWeather(weatherData);
 
-        diaryRepository.save( Diary.builder()
-                                   .weather(parseWeather.get("main").toString())
-                                   .temperature((Double) parseWeather.get("temp"))
-                                   .icon(parseWeather.get("icon").toString())
-                                   .text(text)
-                                   .date(date)
-                                   .build()
+        diaryRepository.save(Diary.builder()
+                                  .weather(parseWeather.get("main").toString())
+                                  .temperature((Double) parseWeather.get("temp"))
+                                  .icon(parseWeather.get("icon").toString())
+                                  .text(request.getText())
+                                  .title(request.getTitle())
+                                  .date(date)
+                                  .build()
         );
     }
 
@@ -100,15 +100,15 @@ public class DiaryService {
             throw new RuntimeException(e);
         }
 
-        Map<String,Object> resultMap = new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<>();
 
         JSONObject mainData = (JSONObject) jsonObject.get("main");
-        resultMap.put("temp",mainData.get("temp"));
+        resultMap.put("temp", mainData.get("temp"));
 
         JSONArray weatherData = (JSONArray) jsonObject.get("weather");
         JSONObject weatherDataObj = (JSONObject) weatherData.get(0);
-        resultMap.put("main",weatherDataObj.get("main"));
-        resultMap.put("icon",weatherDataObj.get("icon"));
+        resultMap.put("main", weatherDataObj.get("main"));
+        resultMap.put("icon", weatherDataObj.get("icon"));
         return resultMap;
     }
 
@@ -125,7 +125,7 @@ public class DiaryService {
     public List<Diary> readDiaries(DateInfo request) {
 
         List<Diary> diaryList
-                = diaryRepository.findAllByDateBetween(request.getStartDate(),request.getEndDate());
+                = diaryRepository.findAllByDateBetween(request.getStartDate(), request.getEndDate());
 
         checkException(diaryList);
 
@@ -133,8 +133,18 @@ public class DiaryService {
     }
 
     private static void checkException(List<Diary> diaryList) {
-        if(0 == diaryList.size()) {
+        if (0 == diaryList.size()) {
             throw new NotFoundDiaryException("일치하는 일기 데이터가 존재하지 않습니다.");
         }
+    }
+
+    @Transactional
+    public void modifyDiary(ModifyDiaryRequestDto request,
+                            Long id) {
+
+        Diary diary = diaryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundDiaryException("일치하는 일기 데이터가 존재하지 않습니다."));
+
+        diary.update(request);
     }
 }
