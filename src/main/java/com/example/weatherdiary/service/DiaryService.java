@@ -1,8 +1,10 @@
 package com.example.weatherdiary.service;
 
+import com.example.weatherdiary.domain.entity.Diary;
 import com.example.weatherdiary.domain.repository.DiaryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -31,12 +33,19 @@ public class DiaryService {
     @Value("${openweathermap.city}")
     private String city;
 
-    public String createDiary(LocalDate date, String text) throws IOException {
+    public void createDiary(LocalDate date, String text) throws IOException {
 
         String weatherData = getWeatherString();
         Map<String, Object> parseWeather = parseWeather(weatherData);
 
-        return "";
+        diaryRepository.save( Diary.builder()
+                                   .weather(parseWeather.get("main").toString())
+                                   .temperature((Double) parseWeather.get("temp"))
+                                   .icon(parseWeather.get("icon").toString())
+                                   .text(text)
+                                   .date(date)
+                                   .build()
+        );
     }
 
 
@@ -87,9 +96,11 @@ public class DiaryService {
 
         JSONObject mainData = (JSONObject) jsonObject.get("main");
         resultMap.put("temp",mainData.get("temp"));
-        JSONObject weatherData = (JSONObject) jsonObject.get("weather");
-        resultMap.put("main",weatherData.get("main"));
-        resultMap.put("icon",weatherData.get("icon"));
+
+        JSONArray weatherData = (JSONArray) jsonObject.get("weather");
+        JSONObject weatherDataObj = (JSONObject) weatherData.get(0);
+        resultMap.put("main",weatherDataObj.get("main"));
+        resultMap.put("icon",weatherDataObj.get("icon"));
         return resultMap;
     }
 }
