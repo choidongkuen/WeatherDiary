@@ -45,7 +45,7 @@ public class DiaryService {
     private String apiKey;
 
     @Value("${openweathermap.city}")
-    private String city;
+    private String cit;
 
 
     @Transactional
@@ -67,9 +67,9 @@ public class DiaryService {
 
     private String getWeatherString() throws IOException { // openweathermap api 호출 데이터 가져오기
 
-        String apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey;
+        String apiUri = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey;
         try {
-            URL url = new URL(apiUrl);
+            URL url = new URL(apiUri);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
 
@@ -120,7 +120,7 @@ public class DiaryService {
     }
 
     @Transactional
-    @Scheduled(cron = "0/5 0 1 * * *")
+    @Scheduled(cron = "0 0 1 * * *")
     public void saveWeatherDate() throws IOException {
         dateWeatherRepository.save(getWeatherFromApi());
     }
