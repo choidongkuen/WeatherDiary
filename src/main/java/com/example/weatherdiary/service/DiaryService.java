@@ -1,6 +1,8 @@
 package com.example.weatherdiary.service;
 
+import com.example.weatherdiary.domain.entity.DateWeather;
 import com.example.weatherdiary.domain.entity.Diary;
+import com.example.weatherdiary.domain.repository.DateWeatherRepository;
 import com.example.weatherdiary.domain.repository.DiaryRepository;
 import com.example.weatherdiary.dto.CreateDiaryRequestDto;
 import com.example.weatherdiary.dto.DateInfo;
@@ -13,6 +15,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,11 +39,14 @@ public class DiaryService {
 
     private final DiaryRepository diaryRepository;
 
+    private final DateWeatherRepository dateWeatherRepository;
+
     @Value("${openweathermap.apiKey}")
     private String apiKey;
 
     @Value("${openweathermap.city}")
     private String city;
+
 
     @Transactional
     public void createDiary(LocalDate date, CreateDiaryRequestDto request) throws IOException {
@@ -58,7 +64,6 @@ public class DiaryService {
                                   .build()
         );
     }
-
 
     private String getWeatherString() throws IOException { // openweathermap api 호출 데이터 가져오기
 
@@ -89,7 +94,6 @@ public class DiaryService {
             return "Failed";
         }
     }
-
     private Map<String, Object> parseWeather(String jsonString) { // openweathermap 데이터 파싱
 
         JSONParser jsonParser = new JSONParser();
@@ -113,6 +117,20 @@ public class DiaryService {
         resultMap.put("main", weatherDataObj.get("main"));
         resultMap.put("icon", weatherDataObj.get("icon"));
         return resultMap;
+    }
+
+    @Transactional
+    @Scheduled(cron = "0/5 0 1 * * *")
+    public void saveWeatherDate() throws IOException {
+        dateWeatherRepository.save(getWeatherFromApi());
+    }
+
+    private DateWeather getWeatherFromApi() throws IOException {
+
+        String weatherData = getWeatherString();
+        Map<String, Object> parseWeather = parseWeather(weatherData);
+
+        return DateWeather.of(parseWeather);
     }
 
     @Transactional(readOnly = true)
