@@ -52,7 +52,7 @@ public class DiaryController {
     }
 
     @PutMapping("/{diaryId}")
-    public ResponseEntity modifiyDiary(
+    public ResponseEntity modifyDiary(
             @RequestBody ModifyDiaryRequestDto request,
             @PathVariable("diaryId") Long id
     ) {

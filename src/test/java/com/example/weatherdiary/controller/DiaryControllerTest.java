@@ -2,6 +2,7 @@ package com.example.weatherdiary.controller;
 
 import com.example.weatherdiary.domain.entity.Diary;
 import com.example.weatherdiary.dto.CreateDiaryRequestDto;
+import com.example.weatherdiary.dto.ModifyDiaryRequestDto;
 import com.example.weatherdiary.service.DiaryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -19,8 +20,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,7 +39,7 @@ class DiaryControllerTest {
 
     @Test
     @DisplayName("일기 저장 성공 테스트")
-    void createDiary() throws Exception {
+    void createDiaryTest() throws Exception {
 
 
         mockMvc.perform(post("/diary")
@@ -54,7 +54,7 @@ class DiaryControllerTest {
 
     @Test
     @DisplayName("일기 조회 성공 테스트")
-    void readDiary() throws Exception {
+    void readDiaryTest() throws Exception {
         // given
         List<Diary> diaryList = new ArrayList<>();
 
@@ -94,5 +94,34 @@ class DiaryControllerTest {
                .andDo(print());
         // then
     }
+
+    @Test
+    @DisplayName("일기 수정 성공 테스트")
+    void modifyDiaryTest() throws Exception {
+        // given
+
+        // when
+        mockMvc.perform(put("/diary/1")
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content(objectMapper.writeValueAsString(
+                               new ModifyDiaryRequestDto(
+                                       "수정할 제목[테스트]", "수정할 내용[테스트]"
+                               )
+                       ))).andExpect(status().isOk())
+                      .andDo(print());
+        // then
+    }
+
+    @Test
+    @DisplayName("일기 삭제 성공 테스트")
+    void deleteDiaryTest() throws Exception {
+        // given
+
+        // when
+        mockMvc.perform(delete("/diary/1"))
+                .andExpect(status().isOk())
+                .andDo(print());
+        // then
+     }
 
 }
