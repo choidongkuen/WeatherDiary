@@ -26,6 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// Class 에 @Transactional 사용 가능 -> 모든 메소드에 적용
+// Class 에도 붙어있고 메소드에도 붙어있으면 메소드를 우선순위 적용
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -143,7 +146,7 @@ public class DiaryService {
                             Long id) {
 
         Diary diary = diaryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundDiaryException("일치하는 일기 데이터가 존재하지 않습니다."));
+                                     .orElseThrow(() -> new NotFoundDiaryException("일치하는 일기 데이터가 존재하지 않습니다."));
 
         diary.update(request);
     }
@@ -152,7 +155,7 @@ public class DiaryService {
     public void deleteDiary(Long id) {
 
         Diary diary = diaryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundDiaryException("일치하는 일기 데이터가 존재하지 않습니다."));
+                                     .orElseThrow(() -> new NotFoundDiaryException("일치하는 일기 데이터가 존재하지 않습니다."));
 
         diaryRepository.delete(diary);
     }
