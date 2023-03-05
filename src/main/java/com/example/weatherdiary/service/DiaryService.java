@@ -51,18 +51,30 @@ public class DiaryService {
     @Transactional
     public void createDiary(LocalDate date, CreateDiaryRequestDto request) throws IOException {
 
-        String weatherData = getWeatherString();
-        Map<String, Object> parseWeather = parseWeather(weatherData);
+        DateWeather dateWeather = getDateWeather(date);
 
-        diaryRepository.save(Diary.builder()
-                                  .weather(parseWeather.get("main").toString())
-                                  .temperature((Double) parseWeather.get("temp"))
-                                  .icon(parseWeather.get("icon").toString())
-                                  .text(request.getText())
-                                  .title(request.getTitle())
-                                  .date(date)
-                                  .build()
-        );
+        diaryRepository.save(
+                Diary.builder()
+                        .weather(dateWeather.getWeather())
+                        .icon(dateWeather.getIcon())
+                        .temperature(dateWeather.getTemperature())
+                        .title(request.getTitle())
+                        .text(request.getText())
+                        .date(date)
+                        .build());
+
+    }
+
+    private DateWeather getDateWeather(LocalDate date) throws IOException {
+
+        List<DateWeather> dateWeatherListFromDB
+                = dateWeatherRepository.findAllByDate(date); // DB 에서 먼저 가져오기
+
+        if(0 == dateWeatherListFromDB.size()) {
+            return getWeatherFromApi();
+        } else { // 없다면 API 호출
+            return dateWeatherListFromDB.get(0);
+        }
     }
 
     private String getWeatherString() throws IOException { // openweathermap api 호출 데이터 가져오기
@@ -120,7 +132,7 @@ public class DiaryService {
     }
 
     @Transactional
-    @Scheduled(cron = "0/5 0 1 * * *")
+    @Scheduled(cron = "0 0 1 * * *") // 매 오전 1시마다 데이터 API 호출해서 데이터 저장
     public void saveWeatherDate() throws IOException {
         dateWeatherRepository.save(getWeatherFromApi());
     }
