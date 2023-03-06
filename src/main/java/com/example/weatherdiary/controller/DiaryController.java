@@ -5,6 +5,9 @@ import com.example.weatherdiary.dto.CreateDiaryRequestDto;
 import com.example.weatherdiary.dto.DateInfo;
 import com.example.weatherdiary.dto.ModifyDiaryRequestDto;
 import com.example.weatherdiary.service.DiaryService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -24,6 +27,7 @@ public class DiaryController {
 
     private final DiaryService diaryService;
 
+    @ApiOperation(value = "일기 생성 Api") // api 한줄 소개
     @PostMapping()
     public ResponseEntity createDiary(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
@@ -33,15 +37,19 @@ public class DiaryController {
         return ResponseEntity.ok().build();
     }
 
+    @ApiOperation(value = "특정 날짜 일기 조회 Api")
     @GetMapping()
     public ResponseEntity<List<Diary>> readDiary(
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd")
+            @ApiParam(value = "날짜 형식 : yyyy-MM-dd",example = "2020-02-03") LocalDate date
     ) {
         return new ResponseEntity<>(
                 diaryService.readDiary(date), HttpStatus.OK);
 
     }
 
+
+    @ApiOperation(value = "두 기간 사이의 일기 조회 Api")
     @GetMapping("/between")
     public ResponseEntity<List<Diary>> readDiaries(
             @ModelAttribute DateInfo request
@@ -51,6 +59,7 @@ public class DiaryController {
         );
     }
 
+    @ApiOperation(value = "일기 수정 Api")
     @PutMapping("/{diaryId}")
     public ResponseEntity modifyDiary(
             @RequestBody ModifyDiaryRequestDto request,
@@ -60,6 +69,7 @@ public class DiaryController {
         return ResponseEntity.ok().build();
     }
 
+    @ApiOperation(value = "일기 삭제 Api")
     @DeleteMapping("{diaryId}")
     public ResponseEntity deleteDiary(
             @PathVariable("diaryId") Long id
