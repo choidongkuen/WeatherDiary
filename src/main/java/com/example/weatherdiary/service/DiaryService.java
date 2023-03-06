@@ -1,5 +1,6 @@
 package com.example.weatherdiary.service;
 
+import com.example.weatherdiary.WeatherDiaryApplication;
 import com.example.weatherdiary.domain.entity.DateWeather;
 import com.example.weatherdiary.domain.entity.Diary;
 import com.example.weatherdiary.domain.repository.DateWeatherRepository;
@@ -14,6 +15,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -41,6 +44,9 @@ public class DiaryService {
 
     private final DateWeatherRepository dateWeatherRepository;
 
+
+    private static final Logger logger = LoggerFactory.getLogger(WeatherDiaryApplication.class);
+
     @Value("${openweathermap.apiKey}")
     private String apiKey;
 
@@ -50,6 +56,8 @@ public class DiaryService {
 
     @Transactional
     public void createDiary(LocalDate date, CreateDiaryRequestDto request) throws IOException {
+
+        logger.info("start to create diary");
 
         DateWeather dateWeather = getDateWeather(date);
 
@@ -62,6 +70,8 @@ public class DiaryService {
                         .text(request.getText())
                         .date(date)
                         .build());
+
+        logger.info("end to create diary");
 
     }
 
@@ -148,8 +158,12 @@ public class DiaryService {
     @Transactional(readOnly = true)
     public List<Diary> readDiary(LocalDate date) {
 
+        log.debug("start to read diary");
+
         List<Diary> diaryList = diaryRepository.findAllByDate(date);
         checkException(diaryList);
+
+        log.debug("end to read diary");
 
         return diaryList;
     }
