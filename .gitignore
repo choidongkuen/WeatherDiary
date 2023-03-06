@@ -35,3 +35,5 @@ out/
 
 ### VS Code ###
 .vscode/
+logs
+# logs 파일은 깃허브에 업로드 x

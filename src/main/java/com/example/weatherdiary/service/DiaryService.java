@@ -10,7 +10,6 @@ import com.example.weatherdiary.dto.DateInfo;
 import com.example.weatherdiary.dto.ModifyDiaryRequestDto;
 import com.example.weatherdiary.exception.NotFoundDiaryException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -35,7 +34,6 @@ import java.util.Map;
 // Class 에 @Transactional 사용 가능 -> 모든 메소드에 적용
 // Class 에도 붙어있고 메소드에도 붙어있으면 메소드를 우선순위 적용
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class DiaryService {
@@ -43,7 +41,6 @@ public class DiaryService {
     private final DiaryRepository diaryRepository;
 
     private final DateWeatherRepository dateWeatherRepository;
-
 
     private static final Logger logger = LoggerFactory.getLogger(WeatherDiaryApplication.class);
 
@@ -111,7 +108,7 @@ public class DiaryService {
             br.close();
             return response.toString();
         } catch (Exception e) {
-            log.error("failed to get response");
+            logger.error("failed to get response");
 
             return "Failed";
         }
@@ -158,12 +155,12 @@ public class DiaryService {
     @Transactional(readOnly = true)
     public List<Diary> readDiary(LocalDate date) {
 
-        log.debug("start to read diary");
+        logger.debug("start to read diary");
 
         List<Diary> diaryList = diaryRepository.findAllByDate(date);
         checkException(diaryList);
 
-        log.debug("end to read diary");
+        logger.debug("end to read diary");
 
         return diaryList;
     }
