@@ -1,7 +1,6 @@
 package com.example.weatherdiary.domain.entity;
 
 import com.example.weatherdiary.dto.ModifyDiaryRequestDto;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Slf4j
